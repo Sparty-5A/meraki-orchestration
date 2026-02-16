@@ -1,0 +1,37 @@
+# API Credentials
+.env
+*.key
+*.pem
+
+# Backup files
+backups/
+*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# UV/uv package manager
+.python-version
+uv.lock
