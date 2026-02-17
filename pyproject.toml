@@ -1,0 +1,18 @@
+[project]
+name = "meraki-orchestration"
+version = "1.0.0"
+requires-python = ">=3.13"
+dependencies = [
+    "meraki>=1.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.ruff]
+line-length = 127
+target-version = "py313"
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 127
+target-version = ["py313"]
