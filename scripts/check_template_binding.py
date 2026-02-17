@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
@@ -19,7 +19,7 @@ def main():
 
     # Get organization
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
 
     # Get all templates
     print("\nConfiguration Templates:")
@@ -41,14 +41,14 @@ def main():
         print(f"  Products: {', '.join(network['productTypes'])}")
 
         # Check if bound to template
-        if 'configTemplateId' in network and network['configTemplateId']:
+        if "configTemplateId" in network and network["configTemplateId"]:
             print(f"  ✓ Bound to template: {network['configTemplateId']}")
 
             # Try to get template name
             template_name = "Unknown"
             for t in templates:
-                if t['id'] == network['configTemplateId']:
-                    template_name = t['name']
+                if t["id"] == network["configTemplateId"]:
+                    template_name = t["name"]
                     break
             print(f"  ✓ Template name: {template_name}")
         else:
@@ -56,7 +56,7 @@ def main():
 
         # Try to check VLANs
         try:
-            vlan_settings = dashboard.appliance.getNetworkApplianceVlansSettings(network['id'])
+            vlan_settings = dashboard.appliance.getNetworkApplianceVlansSettings(network["id"])
             print(f"  VLANs enabled: {vlan_settings.get('vlansEnabled', False)}")
         except Exception as e:
             print(f"  VLAN settings: {e}")

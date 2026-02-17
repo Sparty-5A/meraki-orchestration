@@ -31,12 +31,12 @@ def list_backups():
             with open(backup_file) as f:
                 data = json.load(f)
 
-            network_name = data['metadata']['network_name']
-            timestamp = data['metadata']['timestamp']
+            network_name = data["metadata"]["network_name"]
+            timestamp = data["metadata"]["timestamp"]
             size = backup_file.stat().st_size / 1024
 
             dt = datetime.fromisoformat(timestamp)
-            date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
+            date_str = dt.strftime("%Y-%m-%d %H:%M:%S")
 
             print(f"{i:<4} {network_name:<30} {date_str:<20} {size:>6.1f} KB")
         except:
@@ -47,8 +47,8 @@ def list_backups():
 
 def compare_vlans(backup1, backup2):
     """Compare VLANs between backups"""
-    vlans1 = {v['id']: v for v in backup1.get('appliance', {}).get('vlans', [])}
-    vlans2 = {v['id']: v for v in backup2.get('appliance', {}).get('vlans', [])}
+    vlans1 = {v["id"]: v for v in backup1.get("appliance", {}).get("vlans", [])}
+    vlans2 = {v["id"]: v for v in backup2.get("appliance", {}).get("vlans", [])}
 
     changes = []
 
@@ -70,9 +70,9 @@ def compare_vlans(backup1, backup2):
         v1 = vlans1[vlan_id]
         v2 = vlans2[vlan_id]
 
-        if v1['name'] != v2['name']:
+        if v1["name"] != v2["name"]:
             changes.append(f"  Δ VLAN {vlan_id} renamed: '{v1['name']}' → '{v2['name']}'")
-        if v1['subnet'] != v2['subnet']:
+        if v1["subnet"] != v2["subnet"]:
             changes.append(f"  Δ VLAN {vlan_id} subnet changed: {v1['subnet']} → {v2['subnet']}")
 
     return changes
@@ -80,8 +80,8 @@ def compare_vlans(backup1, backup2):
 
 def compare_firewall_rules(backup1, backup2):
     """Compare firewall rules"""
-    rules1 = backup1.get('appliance', {}).get('firewall_l3', {}).get('rules', [])
-    rules2 = backup2.get('appliance', {}).get('firewall_l3', {}).get('rules', [])
+    rules1 = backup1.get("appliance", {}).get("firewall_l3", {}).get("rules", [])
+    rules2 = backup2.get("appliance", {}).get("firewall_l3", {}).get("rules", [])
 
     changes = []
 
@@ -95,13 +95,13 @@ def compare_firewall_rules(backup1, backup2):
 
     # If counts are same, check for modifications
     for i, (r1, r2) in enumerate(zip(rules1, rules2)):
-        if r1.get('comment') != r2.get('comment'):
-            old_comment = r1.get('comment', '[No comment]')
-            new_comment = r2.get('comment', '[No comment]')
+        if r1.get("comment") != r2.get("comment"):
+            old_comment = r1.get("comment", "[No comment]")
+            new_comment = r2.get("comment", "[No comment]")
             changes.append(f"  Δ Rule {i + 1}: '{old_comment}' → '{new_comment}'")
-        if r1.get('policy') != r2.get('policy'):
+        if r1.get("policy") != r2.get("policy"):
             changes.append(f"  Δ Rule {i + 1} policy: {r1.get('policy')} → {r2.get('policy')}")
-        if r1.get('destCidr') != r2.get('destCidr'):
+        if r1.get("destCidr") != r2.get("destCidr"):
             changes.append(f"  Δ Rule {i + 1} destination changed")
 
     return changes
@@ -109,8 +109,8 @@ def compare_firewall_rules(backup1, backup2):
 
 def compare_ssids(backup1, backup2):
     """Compare wireless SSIDs"""
-    ssids1 = {s['number']: s for s in backup1.get('wireless', {}).get('ssids', [])}
-    ssids2 = {s['number']: s for s in backup2.get('wireless', {}).get('ssids', [])}
+    ssids1 = {s["number"]: s for s in backup1.get("wireless", {}).get("ssids", [])}
+    ssids2 = {s["number"]: s for s in backup2.get("wireless", {}).get("ssids", [])}
 
     changes = []
 
@@ -122,10 +122,10 @@ def compare_ssids(backup1, backup2):
             changes.append(f"  + SSID {num} added: {s2['name']}")
         elif not s2:
             changes.append(f"  - SSID {num} removed: {s1['name']}")
-        elif s1['name'] != s2['name']:
+        elif s1["name"] != s2["name"]:
             changes.append(f"  Δ SSID {num} renamed: '{s1['name']}' → '{s2['name']}'")
-        elif s1.get('enabled') != s2.get('enabled'):
-            status = "enabled" if s2.get('enabled') else "disabled"
+        elif s1.get("enabled") != s2.get("enabled"):
+            status = "enabled" if s2.get("enabled") else "disabled"
             changes.append(f"  Δ SSID {num} ({s2['name']}): {status}")
 
     return changes
@@ -133,8 +133,8 @@ def compare_ssids(backup1, backup2):
 
 def compare_group_policies(backup1, backup2):
     """Compare group policies"""
-    policies1 = {p['groupPolicyId']: p for p in backup1.get('group_policies', [])}
-    policies2 = {p['groupPolicyId']: p for p in backup2.get('group_policies', [])}
+    policies1 = {p["groupPolicyId"]: p for p in backup1.get("group_policies", [])}
+    policies2 = {p["groupPolicyId"]: p for p in backup2.get("group_policies", [])}
 
     changes = []
 
@@ -153,21 +153,21 @@ def compare_switch_ports(backup1, backup2):
     """Compare switch port configurations"""
     changes = []
 
-    switches1 = {s['serial']: s for s in backup1.get('switch', {}).get('devices', [])}
-    switches2 = {s['serial']: s for s in backup2.get('switch', {}).get('devices', [])}
+    switches1 = {s["serial"]: s for s in backup1.get("switch", {}).get("devices", [])}
+    switches2 = {s["serial"]: s for s in backup2.get("switch", {}).get("devices", [])}
 
     for serial in set(switches1.keys()) & set(switches2.keys()):
-        sw1_ports = {p['portId']: p for p in switches1[serial]['ports']}
-        sw2_ports = {p['portId']: p for p in switches2[serial]['ports']}
+        sw1_ports = {p["portId"]: p for p in switches1[serial]["ports"]}
+        sw2_ports = {p["portId"]: p for p in switches2[serial]["ports"]}
 
         port_changes = 0
         for port_id in sw1_ports.keys():
             p1 = sw1_ports[port_id]
             p2 = sw2_ports.get(port_id)
 
-            if p2 and (p1.get('name') != p2.get('name') or
-                       p1.get('type') != p2.get('type') or
-                       p1.get('vlan') != p2.get('vlan')):
+            if p2 and (
+                p1.get("name") != p2.get("name") or p1.get("type") != p2.get("type") or p1.get("vlan") != p2.get("vlan")
+            ):
                 port_changes += 1
 
         if port_changes > 0:
@@ -187,8 +187,8 @@ def compare_backups(file1, file2):
     with open(file2) as f:
         backup2 = json.load(f)
 
-    meta1 = backup1['metadata']
-    meta2 = backup2['metadata']
+    meta1 = backup1["metadata"]
+    meta2 = backup2["metadata"]
 
     print(f"\nBackup 1: {meta1['network_name']}")
     print(f"  Date: {meta1['timestamp']}")

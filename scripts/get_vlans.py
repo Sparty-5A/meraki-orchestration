@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, print_console=True)
 # dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
@@ -19,12 +19,12 @@ dashboard = meraki.DashboardAPI(API_KEY, print_console=True)
 def main():
     # Get organization and networks
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
 
     # Find the branch office network
-    branch_network = [n for n in networks if n['name'] == 'branch office'][0]
-    network_id = branch_network['id']
+    branch_network = [n for n in networks if n["name"] == "branch office"][0]
+    network_id = branch_network["id"]
 
     print(f"Network: {branch_network['name']}")
     print(f"Network ID: {network_id}")

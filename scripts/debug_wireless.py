@@ -10,17 +10,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, print_console=True)  # Enable logging
 
 
 def main():
     # Get network
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
-    branch_network = [n for n in networks if n['name'] == 'branch office'][0]
-    network_id = branch_network['id']
+    branch_network = [n for n in networks if n["name"] == "branch office"][0]
+    network_id = branch_network["id"]
 
     print("=" * 70)
     print("WIRELESS SSID DEBUG")

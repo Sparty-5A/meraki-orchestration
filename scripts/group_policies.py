@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
@@ -24,23 +24,19 @@ def create_executive_policy(network_id):
         policy = dashboard.networks.createNetworkGroupPolicy(
             network_id,
             name="Executive",
-            scheduling={
-                "enabled": False  # No time restrictions
-            },
-            bandwidth={
-                "settings": "network default"  # No bandwidth limit
-            },
+            scheduling={"enabled": False},  # No time restrictions
+            bandwidth={"settings": "network default"},  # No bandwidth limit
             firewallAndTrafficShaping={
                 "settings": "network default",  # No additional restrictions
                 "l3FirewallRules": [],
                 "l7FirewallRules": [],
-                "trafficShapingRules": []
+                "trafficShapingRules": [],
             },
-            splashAuthSettings="network default"
+            splashAuthSettings="network default",
             # Removed contentFiltering - not supported in sandbox
         )
         print(f"  ✓ Executive Policy created: {policy['groupPolicyId']}")
-        return policy['groupPolicyId']
+        return policy["groupPolicyId"]
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
         return None
@@ -65,14 +61,11 @@ def create_employee_policy(network_id):
                 "thursday": {"active": True, "from": "08:00", "to": "18:00"},
                 "friday": {"active": True, "from": "08:00", "to": "18:00"},
                 "saturday": {"active": False},
-                "sunday": {"active": False}
+                "sunday": {"active": False},
             },
             bandwidth={
                 "settings": "custom",
-                "bandwidthLimits": {
-                    "limitUp": 50000,  # 50 Mbps upload
-                    "limitDown": 50000  # 50 Mbps download
-                }
+                "bandwidthLimits": {"limitUp": 50000, "limitDown": 50000},  # 50 Mbps upload  # 50 Mbps download
             },
             firewallAndTrafficShaping={
                 "settings": "custom",
@@ -82,17 +75,17 @@ def create_employee_policy(network_id):
                         "policy": "deny",
                         "protocol": "tcp",
                         "destPort": "any",  # Fixed: using "any" instead of port ranges
-                        "destCidr": "any"
+                        "destCidr": "any",
                     }
                 ],
                 "l7FirewallRules": [],  # Simplified - L7 rules removed for sandbox
-                "trafficShapingRules": []
-            }
+                "trafficShapingRules": [],
+            },
         )
         print(f"  ✓ Employee Policy created: {policy['groupPolicyId']}")
         print("    - 50 Mbps bandwidth limit")
         print("    - Business hours only (8am-6pm, Mon-Fri)")
-        return policy['groupPolicyId']
+        return policy["groupPolicyId"]
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
         return None
@@ -117,14 +110,11 @@ def create_contractor_policy(network_id):
                 "thursday": {"active": True, "from": "09:00", "to": "17:00"},
                 "friday": {"active": True, "from": "09:00", "to": "17:00"},
                 "saturday": {"active": False},
-                "sunday": {"active": False}
+                "sunday": {"active": False},
             },
             bandwidth={
                 "settings": "custom",
-                "bandwidthLimits": {
-                    "limitUp": 5000,  # 5 Mbps upload
-                    "limitDown": 5000  # 5 Mbps download
-                }
+                "bandwidthLimits": {"limitUp": 5000, "limitDown": 5000},  # 5 Mbps upload  # 5 Mbps download
             },
             firewallAndTrafficShaping={
                 "settings": "custom",
@@ -134,32 +124,32 @@ def create_contractor_policy(network_id):
                         "policy": "deny",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "10.0.0.0/8"
+                        "destCidr": "10.0.0.0/8",
                     },
                     {
                         "comment": "Deny internal networks - 172.16.0.0/12",
                         "policy": "deny",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "172.16.0.0/12"
+                        "destCidr": "172.16.0.0/12",
                     },
                     {
                         "comment": "Deny internal networks - 192.168.0.0/16",
                         "policy": "deny",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "192.168.0.0/16"
-                    }
+                        "destCidr": "192.168.0.0/16",
+                    },
                 ],
                 "l7FirewallRules": [],  # Simplified for sandbox
-                "trafficShapingRules": []
-            }
+                "trafficShapingRules": [],
+            },
         )
         print(f"  ✓ Contractor Policy created: {policy['groupPolicyId']}")
         print("    - 5 Mbps bandwidth limit")
         print("    - Limited hours (9am-5pm, Mon-Fri)")
         print("    - Blocks internal networks (RFC1918)")
-        return policy['groupPolicyId']
+        return policy["groupPolicyId"]
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
         return None
@@ -176,15 +166,10 @@ def create_guest_policy(network_id):
         policy = dashboard.networks.createNetworkGroupPolicy(
             network_id,
             name="Guest",
-            scheduling={
-                "enabled": False  # 24/7 access for guests
-            },
+            scheduling={"enabled": False},  # 24/7 access for guests
             bandwidth={
                 "settings": "custom",
-                "bandwidthLimits": {
-                    "limitUp": 2000,  # 2 Mbps upload
-                    "limitDown": 2000  # 2 Mbps download
-                }
+                "bandwidthLimits": {"limitUp": 2000, "limitDown": 2000},  # 2 Mbps upload  # 2 Mbps download
             },
             firewallAndTrafficShaping={
                 "settings": "custom",
@@ -194,39 +179,39 @@ def create_guest_policy(network_id):
                         "policy": "deny",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "10.0.0.0/8"
+                        "destCidr": "10.0.0.0/8",
                     },
                     {
                         "comment": "Deny all internal networks - 172.16.0.0/12",
                         "policy": "deny",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "172.16.0.0/12"
+                        "destCidr": "172.16.0.0/12",
                     },
                     {
                         "comment": "Deny all internal networks - 192.168.0.0/16",
                         "policy": "deny",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "192.168.0.0/16"
+                        "destCidr": "192.168.0.0/16",
                     },
                     {
                         "comment": "Allow internet only",
                         "policy": "allow",
                         "protocol": "any",
                         "destPort": "any",
-                        "destCidr": "any"
-                    }
+                        "destCidr": "any",
+                    },
                 ],
                 "l7FirewallRules": [],  # Simplified
-                "trafficShapingRules": []
-            }
+                "trafficShapingRules": [],
+            },
         )
         print(f"  ✓ Guest Policy created: {policy['groupPolicyId']}")
         print("    - 2 Mbps bandwidth limit")
         print("    - Internet only (no internal access)")
         print("    - 24/7 access")
-        return policy['groupPolicyId']
+        return policy["groupPolicyId"]
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
         return None
@@ -248,20 +233,20 @@ def list_group_policies(network_id):
         print("-" * 70)
 
         for policy in policies:
-            name = policy.get('name', 'N/A')[:18]
-            policy_id = str(policy.get('groupPolicyId', 'N/A'))[:8]
+            name = policy.get("name", "N/A")[:18]
+            policy_id = str(policy.get("groupPolicyId", "N/A"))[:8]
 
             # Bandwidth
-            bw_settings = policy.get('bandwidth', {}).get('settings', 'default')
-            if bw_settings == 'custom':
-                limits = policy.get('bandwidth', {}).get('bandwidthLimits', {})
+            bw_settings = policy.get("bandwidth", {}).get("settings", "default")
+            if bw_settings == "custom":
+                limits = policy.get("bandwidth", {}).get("bandwidthLimits", {})
                 bw = f"{limits.get('limitDown', 0) / 1000:.0f} Mbps"
             else:
                 bw = "Unlimited"
 
             # Scheduling
-            sched = policy.get('scheduling', {})
-            if sched.get('enabled'):
+            sched = policy.get("scheduling", {})
+            if sched.get("enabled"):
                 scheduling = "Scheduled"
             else:
                 scheduling = "24/7"
@@ -281,12 +266,12 @@ def main():
 
     # Get organization
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
 
     # Use branch office network
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
-    branch_office = [n for n in networks if 'branch office' in n['name'].lower()][0]
-    network_id = branch_office['id']
+    branch_office = [n for n in networks if "branch office" in n["name"].lower()][0]
+    network_id = branch_office["id"]
 
     print(f"\nNetwork: {branch_office['name']}")
     print(f"Network ID: {network_id}")

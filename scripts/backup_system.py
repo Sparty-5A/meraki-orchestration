@@ -12,7 +12,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True, maximum_retries=3)
 
 # Backup directory
@@ -29,25 +29,25 @@ def backup_network_full(network_id, network_name):
     print(f"{'=' * 70}")
 
     backup = {
-        'metadata': {
-            'timestamp': datetime.now().isoformat(),
-            'network_id': network_id,
-            'network_name': network_name,
-            'backup_version': '1.0'
+        "metadata": {
+            "timestamp": datetime.now().isoformat(),
+            "network_id": network_id,
+            "network_name": network_name,
+            "backup_version": "1.0",
         },
-        'network': {},
-        'appliance': {},
-        'switch': {},
-        'wireless': {},
-        'devices': []
+        "network": {},
+        "appliance": {},
+        "switch": {},
+        "wireless": {},
+        "devices": [],
     }
 
     # Network-level settings
     print("\n[1/6] Backing up network settings...")
     try:
-        backup['network'] = {
-            'details': dashboard.networks.getNetwork(network_id),
-            'alerts': dashboard.networks.getNetworkAlertsSettings(network_id)
+        backup["network"] = {
+            "details": dashboard.networks.getNetwork(network_id),
+            "alerts": dashboard.networks.getNetworkAlertsSettings(network_id),
         }
         print("  ✓ Network settings backed up")
     except Exception as e:
@@ -56,25 +56,22 @@ def backup_network_full(network_id, network_name):
     # Appliance settings (MX)
     print("\n[2/6] Backing up appliance configuration...")
     try:
-        backup['appliance']['vlans'] = dashboard.appliance.getNetworkApplianceVlans(network_id)
-        backup['appliance']['firewall_l3'] = dashboard.appliance.getNetworkApplianceFirewallL3FirewallRules(network_id)
-        backup['appliance']['firewall_l7'] = dashboard.appliance.getNetworkApplianceFirewallL7FirewallRules(network_id)
-        backup['appliance']['traffic_shaping'] = dashboard.appliance.getNetworkApplianceTrafficShaping(network_id)
-        backup['appliance']['vpn_settings'] = dashboard.appliance.getNetworkApplianceVpnSiteToSiteVpn(network_id)
-        backup['appliance']['content_filtering'] = dashboard.appliance.getNetworkApplianceContentFiltering(network_id)
+        backup["appliance"]["vlans"] = dashboard.appliance.getNetworkApplianceVlans(network_id)
+        backup["appliance"]["firewall_l3"] = dashboard.appliance.getNetworkApplianceFirewallL3FirewallRules(network_id)
+        backup["appliance"]["firewall_l7"] = dashboard.appliance.getNetworkApplianceFirewallL7FirewallRules(network_id)
+        backup["appliance"]["traffic_shaping"] = dashboard.appliance.getNetworkApplianceTrafficShaping(network_id)
+        backup["appliance"]["vpn_settings"] = dashboard.appliance.getNetworkApplianceVpnSiteToSiteVpn(network_id)
+        backup["appliance"]["content_filtering"] = dashboard.appliance.getNetworkApplianceContentFiltering(network_id)
 
         # Try AMP separately - might not be supported in sandbox
         try:
-            backup['appliance']['security_malware'] = dashboard.appliance.getNetworkApplianceSecurityMalware(network_id)
+            backup["appliance"]["security_malware"] = dashboard.appliance.getNetworkApplianceSecurityMalware(network_id)
         except:
-            backup['appliance']['security_malware'] = {'mode': 'disabled', 'note': 'AMP not supported in sandbox'}
+            backup["appliance"]["security_malware"] = {"mode": "disabled", "note": "AMP not supported in sandbox"}
 
-        backup['appliance']['port_forwarding'] = dashboard.appliance.getNetworkApplianceFirewallPortForwardingRules(
-            network_id)
-        backup['appliance']['one_to_one_nat'] = dashboard.appliance.getNetworkApplianceFirewallOneToOneNatRules(
-            network_id)
-        backup['appliance']['one_to_many_nat'] = dashboard.appliance.getNetworkApplianceFirewallOneToManyNatRules(
-            network_id)
+        backup["appliance"]["port_forwarding"] = dashboard.appliance.getNetworkApplianceFirewallPortForwardingRules(network_id)
+        backup["appliance"]["one_to_one_nat"] = dashboard.appliance.getNetworkApplianceFirewallOneToOneNatRules(network_id)
+        backup["appliance"]["one_to_many_nat"] = dashboard.appliance.getNetworkApplianceFirewallOneToManyNatRules(network_id)
 
         print("  ✓ Appliance configuration backed up")
         print(f"    - {len(backup['appliance']['vlans'])} VLANs")
@@ -87,23 +84,23 @@ def backup_network_full(network_id, network_name):
     try:
         # Get all switches in network
         devices = dashboard.networks.getNetworkDevices(network_id)
-        switches = [d for d in devices if d['model'].startswith('MS')]
+        switches = [d for d in devices if d["model"].startswith("MS")]
 
-        backup['switch']['devices'] = []
+        backup["switch"]["devices"] = []
         for switch in switches:
             # FIXED: Better name handling - use model+serial if no name
-            device_name = switch.get('name') or f"{switch['model']}-{switch['serial'][-4:]}"
+            device_name = switch.get("name") or f"{switch['model']}-{switch['serial'][-4:]}"
 
             switch_config = {
-                'serial': switch['serial'],
-                'name': device_name,
-                'model': switch['model'],
-                'ports': dashboard.switch.getDeviceSwitchPorts(switch['serial'])
+                "serial": switch["serial"],
+                "name": device_name,
+                "model": switch["model"],
+                "ports": dashboard.switch.getDeviceSwitchPorts(switch["serial"]),
             }
-            backup['switch']['devices'].append(switch_config)
+            backup["switch"]["devices"].append(switch_config)
 
         print(f"  ✓ {len(switches)} switch(es) backed up")
-        for sw in backup['switch']['devices']:
+        for sw in backup["switch"]["devices"]:
             print(f"    - {sw['name']}: {len(sw['ports'])} ports")
     except Exception as e:
         print(f"  ⚠ Switch config: {e}")
@@ -113,11 +110,11 @@ def backup_network_full(network_id, network_name):
     try:
         ssids = dashboard.wireless.getNetworkWirelessSsids(network_id)
         # Only backup configured SSIDs (not "Unconfigured")
-        configured_ssids = [s for s in ssids if not s['name'].startswith('Unconfigured')]
+        configured_ssids = [s for s in ssids if not s["name"].startswith("Unconfigured")]
 
-        backup['wireless'] = {
-            'ssids': configured_ssids,
-            'rf_profiles': dashboard.wireless.getNetworkWirelessRfProfiles(network_id)
+        backup["wireless"] = {
+            "ssids": configured_ssids,
+            "rf_profiles": dashboard.wireless.getNetworkWirelessRfProfiles(network_id),
         }
         print("  ✓ Wireless configuration backed up")
         print(f"    - {len(configured_ssids)} configured SSID(s)")
@@ -128,7 +125,7 @@ def backup_network_full(network_id, network_name):
     print("\n[5/6] Backing up group policies...")
     try:
         policies = dashboard.networks.getNetworkGroupPolicies(network_id)
-        backup['group_policies'] = policies
+        backup["group_policies"] = policies
         print(f"  ✓ {len(policies)} group policy(ies) backed up")
     except Exception as e:
         print(f"  ⚠ Group policies: {e}")
@@ -139,10 +136,10 @@ def backup_network_full(network_id, network_name):
         devices = dashboard.networks.getNetworkDevices(network_id)
         # FIXED: Better name handling - provide default names
         for device in devices:
-            if not device.get('name'):
-                device['name'] = f"{device['model']}-{device['serial'][-4:]}"
+            if not device.get("name"):
+                device["name"] = f"{device['model']}-{device['serial'][-4:]}"
 
-        backup['devices'] = devices
+        backup["devices"] = devices
         print(f"  ✓ {len(devices)} device(s) inventoried")
         for device in devices:
             print(f"    - {device['name']} ({device['model']})")
@@ -156,14 +153,14 @@ def save_backup(backup, network_name):
     """
     Save backup to timestamped JSON file
     """
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     # Sanitize network name for filename
-    safe_name = "".join(c for c in network_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
-    safe_name = safe_name.replace(' ', '_')
+    safe_name = "".join(c for c in network_name if c.isalnum() or c in (" ", "-", "_")).rstrip()
+    safe_name = safe_name.replace(" ", "_")
 
     filename = BACKUP_DIR / f"backup_{safe_name}_{timestamp}.json"
 
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(backup, f, indent=2)
 
     print(f"\n{'=' * 70}")
@@ -198,13 +195,13 @@ def list_backups():
             with open(backup_file) as f:
                 data = json.load(f)
 
-            network_name = data['metadata']['network_name']
-            timestamp = data['metadata']['timestamp']
+            network_name = data["metadata"]["network_name"]
+            timestamp = data["metadata"]["timestamp"]
             size = backup_file.stat().st_size / 1024
 
             # Parse timestamp
             dt = datetime.fromisoformat(timestamp)
-            date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
+            date_str = dt.strftime("%Y-%m-%d %H:%M:%S")
 
             print(f"{i:<4} {network_name:<30} {date_str:<20} {size:>6.1f} KB")
         except Exception:
@@ -221,7 +218,7 @@ def display_backup_summary(backup):
     print("BACKUP SUMMARY")
     print(f"{'=' * 70}")
 
-    meta = backup['metadata']
+    meta = backup["metadata"]
     print(f"\nNetwork: {meta['network_name']}")
     print(f"Backup Date: {meta['timestamp']}")
     print(f"Network ID: {meta['network_id']}")
@@ -229,7 +226,7 @@ def display_backup_summary(backup):
     print("\nConfiguration Items:")
 
     # VLANs
-    vlans = backup.get('appliance', {}).get('vlans', [])
+    vlans = backup.get("appliance", {}).get("vlans", [])
     print(f"  VLANs: {len(vlans)}")
     for vlan in vlans[:5]:  # Show first 5
         print(f"    - VLAN {vlan['id']}: {vlan['name']} ({vlan['subnet']})")
@@ -237,23 +234,23 @@ def display_backup_summary(backup):
         print(f"    ... and {len(vlans) - 5} more")
 
     # Firewall rules
-    rules = backup.get('appliance', {}).get('firewall_l3', {}).get('rules', [])
+    rules = backup.get("appliance", {}).get("firewall_l3", {}).get("rules", [])
     print(f"\n  Firewall Rules (L3): {len(rules)}")
 
     # SSIDs
-    ssids = backup.get('wireless', {}).get('ssids', [])
+    ssids = backup.get("wireless", {}).get("ssids", [])
     print(f"\n  Wireless SSIDs: {len(ssids)}")
     for ssid in ssids:
         print(f"    - {ssid['name']} (VLAN {ssid.get('defaultVlanId', 'N/A')})")
 
     # Group Policies
-    policies = backup.get('group_policies', [])
+    policies = backup.get("group_policies", [])
     print(f"\n  Group Policies: {len(policies)}")
     for policy in policies:
         print(f"    - {policy['name']}")
 
     # Devices
-    devices = backup.get('devices', [])
+    devices = backup.get("devices", [])
     print(f"\n  Devices: {len(devices)}")
     for device in devices:
         print(f"    - {device['name']} ({device['model']}, {device['serial']})")
@@ -268,8 +265,8 @@ def main():
 
     # Get organization
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
-    org_name = orgs[0]['name']
+    org_id = orgs[0]["id"]
+    org_name = orgs[0]["name"]
 
     print(f"\nOrganization: {org_name}")
 
@@ -278,9 +275,9 @@ def main():
     print(f"Networks: {len(networks)}")
 
     # Find branch office (has actual config)
-    branch_office = [n for n in networks if 'branch office' in n['name'].lower()][0]
-    network_id = branch_office['id']
-    network_name = branch_office['name']
+    branch_office = [n for n in networks if "branch office" in n["name"].lower()][0]
+    network_id = branch_office["id"]
+    network_name = branch_office["name"]
 
     print(f"\nBacking up: {network_name}")
 

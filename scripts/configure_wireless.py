@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
@@ -24,67 +24,64 @@ def configure_ssids(network_id):
 
     ssid_configs = [
         {
-            'number': 0,
-            'name': 'Shure-Corporate',
-            'enabled': True,
-            'authMode': 'psk',  # In production, use '8021x-radius' with ISE
-            'encryptionMode': 'wpa',
-            'psk': 'CorporatePassword123!',
-            'ipAssignmentMode': 'Bridge mode',
-            'defaultVlanId': 10,
-            'visible': True,
-            'availableOnAllAps': True,
-            'bandSelection': 'Dual band operation',
-            'minBitrate': 12  # Force 802.11g/n/ac (no legacy 802.11b)
+            "number": 0,
+            "name": "Shure-Corporate",
+            "enabled": True,
+            "authMode": "psk",  # In production, use '8021x-radius' with ISE
+            "encryptionMode": "wpa",
+            "psk": "CorporatePassword123!",
+            "ipAssignmentMode": "Bridge mode",
+            "defaultVlanId": 10,
+            "visible": True,
+            "availableOnAllAps": True,
+            "bandSelection": "Dual band operation",
+            "minBitrate": 12,  # Force 802.11g/n/ac (no legacy 802.11b)
         },
         {
-            'number': 1,
-            'name': 'Shure-Guest',
-            'enabled': True,
-            'authMode': 'open',
-            'splashPage': 'Click-through splash page',
-            'ipAssignmentMode': 'Bridge mode',
-            'defaultVlanId': 20,
-            'visible': True,
-            'availableOnAllAps': True,
-            'bandSelection': '5 GHz band only',  # Force 5GHz for better performance
-            'minBitrate': 12,
-            'walledGardenEnabled': True,
-            'walledGardenRanges': [
-                '*.google.com',
-                '*.cloudflare.com'
-            ]
+            "number": 1,
+            "name": "Shure-Guest",
+            "enabled": True,
+            "authMode": "open",
+            "splashPage": "Click-through splash page",
+            "ipAssignmentMode": "Bridge mode",
+            "defaultVlanId": 20,
+            "visible": True,
+            "availableOnAllAps": True,
+            "bandSelection": "5 GHz band only",  # Force 5GHz for better performance
+            "minBitrate": 12,
+            "walledGardenEnabled": True,
+            "walledGardenRanges": ["*.google.com", "*.cloudflare.com"],
         },
         {
-            'number': 2,
-            'name': 'Shure-IoT',
-            'enabled': True,
-            'authMode': 'psk',
-            'encryptionMode': 'wpa',
-            'psk': 'IoTDevices2024!',
-            'ipAssignmentMode': 'Bridge mode',
-            'defaultVlanId': 30,
-            'visible': False,  # Hidden SSID for security
-            'availableOnAllAps': True,
-            'bandSelection': 'Dual band operation',
-            'minBitrate': 11
+            "number": 2,
+            "name": "Shure-IoT",
+            "enabled": True,
+            "authMode": "psk",
+            "encryptionMode": "wpa",
+            "psk": "IoTDevices2024!",
+            "ipAssignmentMode": "Bridge mode",
+            "defaultVlanId": 30,
+            "visible": False,  # Hidden SSID for security
+            "availableOnAllAps": True,
+            "bandSelection": "Dual band operation",
+            "minBitrate": 11,
         },
         {
-            'number': 3,
-            'name': 'Shure-Voice',
-            'enabled': True,
-            'authMode': 'psk',
-            'encryptionMode': 'wpa',
-            'psk': 'VoicePhones2024!',
-            'ipAssignmentMode': 'Bridge mode',
-            'defaultVlanId': 40,
-            'visible': False,  # Hidden - only voice devices need it
-            'availableOnAllAps': True,
-            'bandSelection': '5 GHz band only',  # 5GHz for better QoS
-            'minBitrate': 12,
-            'perClientBandwidthLimitUp': 1024,  # 1 Mbps per client (voice doesn't need more)
-            'perClientBandwidthLimitDown': 1024
-        }
+            "number": 3,
+            "name": "Shure-Voice",
+            "enabled": True,
+            "authMode": "psk",
+            "encryptionMode": "wpa",
+            "psk": "VoicePhones2024!",
+            "ipAssignmentMode": "Bridge mode",
+            "defaultVlanId": 40,
+            "visible": False,  # Hidden - only voice devices need it
+            "availableOnAllAps": True,
+            "bandSelection": "5 GHz band only",  # 5GHz for better QoS
+            "minBitrate": 12,
+            "perClientBandwidthLimitUp": 1024,  # 1 Mbps per client (voice doesn't need more)
+            "perClientBandwidthLimitDown": 1024,
+        },
     ]
 
     print("Configuring Wireless SSIDs...")
@@ -92,14 +89,11 @@ def configure_ssids(network_id):
 
     for ssid_config in ssid_configs:
         try:
-            response = dashboard.wireless.updateNetworkWirelessSsid(
-                network_id,
-                **ssid_config
-            )
+            response = dashboard.wireless.updateNetworkWirelessSsid(network_id, **ssid_config)
 
-            vlan = ssid_config.get('defaultVlanId', 'N/A')
-            auth = ssid_config['authMode']
-            visible = "Visible" if ssid_config.get('visible', True) else "Hidden"
+            vlan = ssid_config.get("defaultVlanId", "N/A")
+            auth = ssid_config["authMode"]
+            visible = "Visible" if ssid_config.get("visible", True) else "Hidden"
 
             print(f"✓ SSID {ssid_config['number']}: {ssid_config['name']}")
             print(f"  VLAN: {vlan} | Auth: {auth} | {visible}")
@@ -120,7 +114,7 @@ def verify_ssids(network_id):
     ssids = dashboard.wireless.getNetworkWirelessSsids(network_id)
 
     for ssid in ssids:
-        if ssid['enabled']:
+        if ssid["enabled"]:
             print(f"\nSSID {ssid['number']}: {ssid['name']}")
             print(f"  Enabled: {ssid['enabled']}")
             print(f"  VLAN: {ssid.get('defaultVlanId', 'N/A')}")
@@ -131,10 +125,10 @@ def verify_ssids(network_id):
 def main():
     # Get network
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
-    branch_network = [n for n in networks if n['name'] == 'branch office'][0]
-    network_id = branch_network['id']
+    branch_network = [n for n in networks if n["name"] == "branch office"][0]
+    network_id = branch_network["id"]
 
     print(f"Network: {branch_network['name']}")
     print(f"Network ID: {network_id}\n")

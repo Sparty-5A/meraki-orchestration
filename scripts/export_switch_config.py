@@ -11,15 +11,15 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
 def get_switch_serial(network_id):
     """Find MS switch in network"""
     devices = dashboard.networks.getNetworkDevices(network_id)
-    switches = [d for d in devices if d['model'].startswith('MS')]
-    return switches[0]['serial'] if switches else None
+    switches = [d for d in devices if d["model"].startswith("MS")]
+    return switches[0]["serial"] if switches else None
 
 
 def export_switch_config(serial, network_name):
@@ -29,26 +29,22 @@ def export_switch_config(serial, network_name):
     print(f"\nExporting configuration for switch: {serial}")
 
     config = {
-        'export_info': {
-            'timestamp': datetime.now().isoformat(),
-            'network': network_name,
-            'switch_serial': serial
-        },
-        'device_info': {},
-        'ports': [],
-        'switch_settings': {}
+        "export_info": {"timestamp": datetime.now().isoformat(), "network": network_name, "switch_serial": serial},
+        "device_info": {},
+        "ports": [],
+        "switch_settings": {},
     }
 
     # Get device details
     try:
         device = dashboard.devices.getDevice(serial)
-        config['device_info'] = {
-            'model': device.get('model'),
-            'name': device.get('name'),
-            'mac': device.get('mac'),
-            'lan_ip': device.get('lanIp'),
-            'firmware': device.get('firmware'),
-            'tags': device.get('tags', [])
+        config["device_info"] = {
+            "model": device.get("model"),
+            "name": device.get("name"),
+            "mac": device.get("mac"),
+            "lan_ip": device.get("lanIp"),
+            "firmware": device.get("firmware"),
+            "tags": device.get("tags", []),
         }
         print("  ✓ Device info retrieved")
     except Exception as e:
@@ -57,7 +53,7 @@ def export_switch_config(serial, network_name):
     # Get all port configurations
     try:
         ports = dashboard.switch.getDeviceSwitchPorts(serial)
-        config['ports'] = ports
+        config["ports"] = ports
         print(f"  ✓ Retrieved {len(ports)} port configurations")
     except Exception as e:
         print(f"  ✗ Error getting ports: {e}")
@@ -67,7 +63,7 @@ def export_switch_config(serial, network_name):
 
 def save_config_json(config, filename):
     """Save configuration to JSON file"""
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(config, f, indent=2)
     print(f"\n✓ Configuration saved to: {filename}")
 
@@ -79,7 +75,7 @@ def display_config_summary(config):
     print(f"{'=' * 70}")
 
     # Device info
-    device = config.get('device_info', {})
+    device = config.get("device_info", {})
     print("\nDevice Information:")
     print(f"  Model: {device.get('model', 'N/A')}")
     print(f"  Name: {device.get('name', 'N/A')}")
@@ -88,11 +84,11 @@ def display_config_summary(config):
     print(f"  IP Address: {device.get('lan_ip', 'N/A')}")
 
     # Port summary
-    ports = config.get('ports', [])
-    access_ports = [p for p in ports if p.get('type') == 'access']
-    trunk_ports = [p for p in ports if p.get('type') == 'trunk']
-    poe_ports = [p for p in ports if p.get('poeEnabled')]
-    voice_ports = [p for p in ports if p.get('voiceVlan')]
+    ports = config.get("ports", [])
+    access_ports = [p for p in ports if p.get("type") == "access"]
+    trunk_ports = [p for p in ports if p.get("type") == "trunk"]
+    poe_ports = [p for p in ports if p.get("poeEnabled")]
+    voice_ports = [p for p in ports if p.get("voiceVlan")]
 
     print("\nPort Statistics:")
     print(f"  Total Ports: {len(ports)}")
@@ -104,10 +100,10 @@ def display_config_summary(config):
     # VLAN usage
     vlans_used = set()
     for port in ports:
-        if port.get('vlan'):
-            vlans_used.add(port.get('vlan'))
-        if port.get('voiceVlan'):
-            vlans_used.add(port.get('voiceVlan'))
+        if port.get("vlan"):
+            vlans_used.add(port.get("vlan"))
+        if port.get("voiceVlan"):
+            vlans_used.add(port.get("voiceVlan"))
 
     print(f"\nVLANs in Use: {sorted(vlans_used)}")
 
@@ -116,13 +112,13 @@ def display_config_summary(config):
     print("-" * 70)
 
     for port in ports[:24]:
-        port_id = port.get('portId', 'N/A')
-        name = port.get('name', 'Unconfigured')[:18]
-        port_type = port.get('type', 'N/A')
-        vlan = str(port.get('vlan', '-'))
-        voice = str(port.get('voiceVlan', '-'))
-        poe = "Yes" if port.get('poeEnabled') else "No"
-        enabled = "Enabled" if port.get('enabled') else "Disabled"
+        port_id = port.get("portId", "N/A")
+        name = port.get("name", "Unconfigured")[:18]
+        port_type = port.get("type", "N/A")
+        vlan = str(port.get("vlan", "-"))
+        voice = str(port.get("voiceVlan", "-"))
+        poe = "Yes" if port.get("poeEnabled") else "No"
+        enabled = "Enabled" if port.get("enabled") else "Disabled"
 
         print(f"{port_id:<6} {name:<20} {port_type:<8} {vlan:<6} {voice:<6} {poe:<4} {enabled:<8}")
 
@@ -134,15 +130,15 @@ def main():
 
     # Get organization
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
 
     # Get networks
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
 
     # Find branch office
-    branch_office = [n for n in networks if 'branch office' in n['name'].lower()][0]
-    network_id = branch_office['id']
-    network_name = branch_office['name']
+    branch_office = [n for n in networks if "branch office" in n["name"].lower()][0]
+    network_id = branch_office["id"]
+    network_name = branch_office["name"]
 
     print(f"\nNetwork: {network_name}")
 
@@ -156,7 +152,7 @@ def main():
     config = export_switch_config(switch_serial, network_name)
 
     # Generate filename
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"switch_config_{switch_serial}_{timestamp}.json"
 
     # Save to file

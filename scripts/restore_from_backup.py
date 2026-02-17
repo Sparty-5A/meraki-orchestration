@@ -12,7 +12,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True, maximum_retries=3)
 
 BACKUP_DIR = Path("backups")
@@ -38,12 +38,12 @@ def list_backups():
             with open(backup_file) as f:
                 data = json.load(f)
 
-            network_name = data['metadata']['network_name']
-            timestamp = data['metadata']['timestamp']
+            network_name = data["metadata"]["network_name"]
+            timestamp = data["metadata"]["timestamp"]
             size = backup_file.stat().st_size / 1024
 
             dt = datetime.fromisoformat(timestamp)
-            date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
+            date_str = dt.strftime("%Y-%m-%d %H:%M:%S")
 
             print(f"{i:<4} {network_name:<30} {date_str:<20} {size:>6.1f} KB")
         except:
@@ -59,33 +59,25 @@ def restore_vlans(network_id, vlans_backup):
     # Get current VLANs
     try:
         current_vlans = dashboard.appliance.getNetworkApplianceVlans(network_id)
-        current_vlan_ids = {v['id'] for v in current_vlans}
+        current_vlan_ids = {v["id"] for v in current_vlans}
     except:
         current_vlan_ids = set()
 
-    backup_vlan_ids = {v['id'] for v in vlans_backup}
+    backup_vlan_ids = {v["id"] for v in vlans_backup}
 
     # Create/update VLANs from backup
     for vlan in vlans_backup:
         try:
-            if vlan['id'] in current_vlan_ids:
+            if vlan["id"] in current_vlan_ids:
                 # Update existing
                 dashboard.appliance.updateNetworkApplianceVlan(
-                    network_id,
-                    vlan['id'],
-                    name=vlan['name'],
-                    subnet=vlan['subnet'],
-                    applianceIp=vlan['applianceIp']
+                    network_id, vlan["id"], name=vlan["name"], subnet=vlan["subnet"], applianceIp=vlan["applianceIp"]
                 )
                 print(f"  ✓ Updated VLAN {vlan['id']}: {vlan['name']}")
             else:
                 # Create new
                 dashboard.appliance.createNetworkApplianceVlan(
-                    network_id,
-                    id=str(vlan['id']),
-                    name=vlan['name'],
-                    subnet=vlan['subnet'],
-                    applianceIp=vlan['applianceIp']
+                    network_id, id=str(vlan["id"]), name=vlan["name"], subnet=vlan["subnet"], applianceIp=vlan["applianceIp"]
                 )
                 print(f"  ✓ Created VLAN {vlan['id']}: {vlan['name']}")
         except Exception as e:
@@ -97,18 +89,18 @@ def restore_firewall_rules(network_id, firewall_backup):
     print("\n[2/5] Restoring firewall rules...")
 
     try:
-        rules = firewall_backup.get('rules', [])
+        rules = firewall_backup.get("rules", [])
 
         # Filter out ALL default allow-all rules
         # Keep only rules with specific purposes (deny rules, specific allows)
         explicit_rules = []
         for rule in rules:
-            comment = rule.get('comment', '').lower()
-            policy = rule.get('policy', '')
-            dest = rule.get('destCidr', '')
+            comment = rule.get("comment", "").lower()
+            policy = rule.get("policy", "")
+            dest = rule.get("destCidr", "")
 
             # Skip any "default" allow-all rules
-            if 'default' in comment and policy == 'allow' and dest in ['Any', 'any']:
+            if "default" in comment and policy == "allow" and dest in ["Any", "any"]:
                 print(f"  ⊘ Skipping default rule: '{rule.get('comment')}'")
                 continue
 
@@ -119,10 +111,7 @@ def restore_firewall_rules(network_id, firewall_backup):
         print("  ℹ Meraki will add its own default allow rule automatically")
 
         # Replace all rules with filtered set
-        dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(
-            network_id,
-            rules=explicit_rules
-        )
+        dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(network_id, rules=explicit_rules)
 
         print("  ✓ Firewall rules restored")
 
@@ -136,31 +125,24 @@ def restore_ssids(network_id, ssids_backup):
 
     for ssid in ssids_backup:
         try:
-            number = ssid['number']
+            number = ssid["number"]
 
             # Build update parameters (only include what's in backup)
-            params = {
-                'name': ssid['name'],
-                'enabled': ssid.get('enabled', True)
-            }
+            params = {"name": ssid["name"], "enabled": ssid.get("enabled", True)}
 
             # Add optional parameters if present
-            if 'authMode' in ssid:
-                params['authMode'] = ssid['authMode']
-            if 'encryptionMode' in ssid:
-                params['encryptionMode'] = ssid['encryptionMode']
-            if 'psk' in ssid:
-                params['psk'] = ssid['psk']
-            if 'defaultVlanId' in ssid:
-                params['defaultVlanId'] = ssid['defaultVlanId']
-            if 'ipAssignmentMode' in ssid:
-                params['ipAssignmentMode'] = ssid['ipAssignmentMode']
+            if "authMode" in ssid:
+                params["authMode"] = ssid["authMode"]
+            if "encryptionMode" in ssid:
+                params["encryptionMode"] = ssid["encryptionMode"]
+            if "psk" in ssid:
+                params["psk"] = ssid["psk"]
+            if "defaultVlanId" in ssid:
+                params["defaultVlanId"] = ssid["defaultVlanId"]
+            if "ipAssignmentMode" in ssid:
+                params["ipAssignmentMode"] = ssid["ipAssignmentMode"]
 
-            dashboard.wireless.updateNetworkWirelessSsid(
-                network_id,
-                number,
-                **params
-            )
+            dashboard.wireless.updateNetworkWirelessSsid(network_id, number, **params)
             print(f"  ✓ Restored SSID {number}: {ssid['name']}")
         except Exception as e:
             print(f"  ⚠ SSID {number}: {e}")
@@ -173,13 +155,13 @@ def restore_group_policies(network_id, policies_backup):
     # Get current policies
     try:
         current_policies = dashboard.networks.getNetworkGroupPolicies(network_id)
-        current_names = {p['name'] for p in current_policies}
+        current_names = {p["name"] for p in current_policies}
     except:
         current_names = set()
 
     for policy in policies_backup:
         try:
-            name = policy['name']
+            name = policy["name"]
 
             # Skip if already exists (would need to update, not recreate)
             if name in current_names:
@@ -187,14 +169,14 @@ def restore_group_policies(network_id, policies_backup):
                 continue
 
             # Build parameters
-            params = {'name': name}
+            params = {"name": name}
 
-            if 'scheduling' in policy:
-                params['scheduling'] = policy['scheduling']
-            if 'bandwidth' in policy:
-                params['bandwidth'] = policy['bandwidth']
-            if 'firewallAndTrafficShaping' in policy:
-                params['firewallAndTrafficShaping'] = policy['firewallAndTrafficShaping']
+            if "scheduling" in policy:
+                params["scheduling"] = policy["scheduling"]
+            if "bandwidth" in policy:
+                params["bandwidth"] = policy["bandwidth"]
+            if "firewallAndTrafficShaping" in policy:
+                params["firewallAndTrafficShaping"] = policy["firewallAndTrafficShaping"]
 
             dashboard.networks.createNetworkGroupPolicy(network_id, **params)
             print(f"  ✓ Restored policy: {name}")
@@ -209,28 +191,24 @@ def restore_switch_ports(switch_serial, ports_backup):
     restored = 0
     for port in ports_backup:
         try:
-            port_id = port['portId']
+            port_id = port["portId"]
 
             # Build parameters
             params = {}
-            if 'name' in port:
-                params['name'] = port['name']
-            if 'enabled' in port:
-                params['enabled'] = port['enabled']
-            if 'type' in port:
-                params['type'] = port['type']
-            if 'vlan' in port:
-                params['vlan'] = port['vlan']
-            if 'voiceVlan' in port:
-                params['voiceVlan'] = port['voiceVlan']
-            if 'poeEnabled' in port:
-                params['poeEnabled'] = port['poeEnabled']
+            if "name" in port:
+                params["name"] = port["name"]
+            if "enabled" in port:
+                params["enabled"] = port["enabled"]
+            if "type" in port:
+                params["type"] = port["type"]
+            if "vlan" in port:
+                params["vlan"] = port["vlan"]
+            if "voiceVlan" in port:
+                params["voiceVlan"] = port["voiceVlan"]
+            if "poeEnabled" in port:
+                params["poeEnabled"] = port["poeEnabled"]
 
-            dashboard.switch.updateDeviceSwitchPort(
-                switch_serial,
-                port_id,
-                **params
-            )
+            dashboard.switch.updateDeviceSwitchPort(switch_serial, port_id, **params)
             restored += 1
         except Exception as e:
             print(f"  ⚠ Port {port_id}: {e}")
@@ -248,7 +226,7 @@ def restore_from_backup(backup_file, network_id):
     with open(backup_file) as f:
         backup = json.load(f)
 
-    meta = backup['metadata']
+    meta = backup["metadata"]
     print("\nBackup Details:")
     print(f"  Network: {meta['network_name']}")
     print(f"  Date: {meta['timestamp']}")
@@ -259,7 +237,7 @@ def restore_from_backup(backup_file, network_id):
 
     confirm = input("\nType 'RESTORE' to continue, or anything else to cancel: ")
 
-    if confirm != 'RESTORE':
+    if confirm != "RESTORE":
         print("\n✗ Restore cancelled")
         return
 
@@ -268,25 +246,25 @@ def restore_from_backup(backup_file, network_id):
     print(f"{'=' * 70}")
 
     # Restore VLANs
-    if 'appliance' in backup and 'vlans' in backup['appliance']:
-        restore_vlans(network_id, backup['appliance']['vlans'])
+    if "appliance" in backup and "vlans" in backup["appliance"]:
+        restore_vlans(network_id, backup["appliance"]["vlans"])
 
     # Restore firewall rules
-    if 'appliance' in backup and 'firewall_l3' in backup['appliance']:
-        restore_firewall_rules(network_id, backup['appliance']['firewall_l3'])
+    if "appliance" in backup and "firewall_l3" in backup["appliance"]:
+        restore_firewall_rules(network_id, backup["appliance"]["firewall_l3"])
 
     # Restore SSIDs
-    if 'wireless' in backup and 'ssids' in backup['wireless']:
-        restore_ssids(network_id, backup['wireless']['ssids'])
+    if "wireless" in backup and "ssids" in backup["wireless"]:
+        restore_ssids(network_id, backup["wireless"]["ssids"])
 
     # Restore group policies
-    if 'group_policies' in backup:
-        restore_group_policies(network_id, backup['group_policies'])
+    if "group_policies" in backup:
+        restore_group_policies(network_id, backup["group_policies"])
 
     # Restore switch ports
-    if 'switch' in backup and 'devices' in backup['switch']:
-        for switch in backup['switch']['devices']:
-            restore_switch_ports(switch['serial'], switch['ports'])
+    if "switch" in backup and "devices" in backup["switch"]:
+        for switch in backup["switch"]["devices"]:
+            restore_switch_ports(switch["serial"], switch["ports"])
 
     print(f"\n{'=' * 70}")
     print("RESTORE COMPLETE")
@@ -324,7 +302,7 @@ def main():
         with open(backup_file) as f:
             backup = json.load(f)
 
-        network_id = backup['metadata']['network_id']
+        network_id = backup["metadata"]["network_id"]
 
         # Perform restore
         restore_from_backup(backup_file, network_id)

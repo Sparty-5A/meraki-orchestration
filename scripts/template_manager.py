@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
@@ -22,12 +22,10 @@ def create_template(org_id, template_name):
 
     try:
         template = dashboard.organizations.createOrganizationConfigTemplate(
-            org_id,
-            name=template_name,
-            timeZone='America/Chicago'
+            org_id, name=template_name, timeZone="America/Chicago"
         )
         print(f"✓ Template created: {template['id']}")
-        return template['id']
+        return template["id"]
     except meraki.APIError as e:
         print(f"✗ Error: {e}")
         return None
@@ -42,28 +40,22 @@ def configure_template_vlans(org_id, template_id):
 
     # First, enable VLANs on template
     try:
-        dashboard.appliance.updateNetworkApplianceVlansSettings(
-            template_id,
-            vlansEnabled=True
-        )
+        dashboard.appliance.updateNetworkApplianceVlansSettings(template_id, vlansEnabled=True)
         print("  ✓ VLANs enabled on template")
     except meraki.APIError as e:
         print(f"  ⚠ VLANs may already be enabled: {e}")
 
     vlans = [
-        {'id': '10', 'name': 'Corporate', 'subnet': '10.10.10.0/24', 'applianceIp': '10.10.10.1'},
-        {'id': '20', 'name': 'Guest', 'subnet': '10.10.20.0/24', 'applianceIp': '10.10.20.1'},
-        {'id': '30', 'name': 'IoT', 'subnet': '10.10.30.0/24', 'applianceIp': '10.10.30.1'},
-        {'id': '40', 'name': 'Voice', 'subnet': '10.10.40.0/24', 'applianceIp': '10.10.40.1'},
-        {'id': '50', 'name': 'Management', 'subnet': '10.10.50.0/24', 'applianceIp': '10.10.50.1'},
+        {"id": "10", "name": "Corporate", "subnet": "10.10.10.0/24", "applianceIp": "10.10.10.1"},
+        {"id": "20", "name": "Guest", "subnet": "10.10.20.0/24", "applianceIp": "10.10.20.1"},
+        {"id": "30", "name": "IoT", "subnet": "10.10.30.0/24", "applianceIp": "10.10.30.1"},
+        {"id": "40", "name": "Voice", "subnet": "10.10.40.0/24", "applianceIp": "10.10.40.1"},
+        {"id": "50", "name": "Management", "subnet": "10.10.50.0/24", "applianceIp": "10.10.50.1"},
     ]
 
     for vlan in vlans:
         try:
-            dashboard.appliance.createNetworkApplianceVlan(
-                template_id,
-                **vlan
-            )
+            dashboard.appliance.createNetworkApplianceVlan(template_id, **vlan)
             print(f"  ✓ VLAN {vlan['id']}: {vlan['name']}")
         except meraki.APIError as e:
             if "already exists" in str(e).lower():
@@ -81,66 +73,63 @@ def configure_template_firewall(template_id):
 
     firewall_rules = [
         {
-            'comment': 'Corporate - full access',
-            'policy': 'allow',
-            'protocol': 'any',
-            'srcCidr': '10.10.10.0/24',
-            'srcPort': 'any',
-            'destCidr': 'any',
-            'destPort': 'any'
+            "comment": "Corporate - full access",
+            "policy": "allow",
+            "protocol": "any",
+            "srcCidr": "10.10.10.0/24",
+            "srcPort": "any",
+            "destCidr": "any",
+            "destPort": "any",
         },
         {
-            'comment': 'Management - SSH and HTTPS only',
-            'policy': 'allow',
-            'protocol': 'tcp',
-            'srcCidr': '10.10.50.0/24',
-            'srcPort': 'any',
-            'destCidr': 'any',
-            'destPort': '22,443'
+            "comment": "Management - SSH and HTTPS only",
+            "policy": "allow",
+            "protocol": "tcp",
+            "srcCidr": "10.10.50.0/24",
+            "srcPort": "any",
+            "destCidr": "any",
+            "destPort": "22,443",
         },
         {
-            'comment': 'Guest - block internal networks',
-            'policy': 'deny',
-            'protocol': 'any',
-            'srcCidr': '10.10.20.0/24',
-            'srcPort': 'any',
-            'destCidr': '10.0.0.0/8',
-            'destPort': 'any'
+            "comment": "Guest - block internal networks",
+            "policy": "deny",
+            "protocol": "any",
+            "srcCidr": "10.10.20.0/24",
+            "srcPort": "any",
+            "destCidr": "10.0.0.0/8",
+            "destPort": "any",
         },
         {
-            'comment': 'IoT - block internal networks',
-            'policy': 'deny',
-            'protocol': 'any',
-            'srcCidr': '10.10.30.0/24',
-            'srcPort': 'any',
-            'destCidr': '10.0.0.0/8',
-            'destPort': 'any'
+            "comment": "IoT - block internal networks",
+            "policy": "deny",
+            "protocol": "any",
+            "srcCidr": "10.10.30.0/24",
+            "srcPort": "any",
+            "destCidr": "10.0.0.0/8",
+            "destPort": "any",
         },
         {
-            'comment': 'Voice - SIP signaling',
-            'policy': 'allow',
-            'protocol': 'tcp',
-            'srcCidr': '10.10.40.0/24',
-            'srcPort': 'any',
-            'destCidr': '10.10.40.0/24',
-            'destPort': '5060-5061'
+            "comment": "Voice - SIP signaling",
+            "policy": "allow",
+            "protocol": "tcp",
+            "srcCidr": "10.10.40.0/24",
+            "srcPort": "any",
+            "destCidr": "10.10.40.0/24",
+            "destPort": "5060-5061",
         },
         {
-            'comment': 'Default allow',
-            'policy': 'allow',
-            'protocol': 'any',
-            'srcCidr': 'any',
-            'srcPort': 'any',
-            'destCidr': 'any',
-            'destPort': 'any'
-        }
+            "comment": "Default allow",
+            "policy": "allow",
+            "protocol": "any",
+            "srcCidr": "any",
+            "srcPort": "any",
+            "destCidr": "any",
+            "destPort": "any",
+        },
     ]
 
     try:
-        dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(
-            template_id,
-            rules=firewall_rules
-        )
+        dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(template_id, rules=firewall_rules)
         print(f"  ✓ Configured {len(firewall_rules)} firewall rules")
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
@@ -154,42 +143,39 @@ def configure_template_wireless(template_id):
 
     ssids = [
         {
-            'number': 0,
-            'name': 'Corp-WiFi',
-            'enabled': True,
-            'authMode': 'psk',
-            'encryptionMode': 'wpa',
-            'psk': 'ChangeMe123!',
-            'ipAssignmentMode': 'Bridge mode',
-            'useVlanTagging': True,
-            'defaultVlanId': 10,
-            'visible': True,
-            'bandSelection': 'Dual band operation',
-            'minBitrate': 12
+            "number": 0,
+            "name": "Corp-WiFi",
+            "enabled": True,
+            "authMode": "psk",
+            "encryptionMode": "wpa",
+            "psk": "ChangeMe123!",
+            "ipAssignmentMode": "Bridge mode",
+            "useVlanTagging": True,
+            "defaultVlanId": 10,
+            "visible": True,
+            "bandSelection": "Dual band operation",
+            "minBitrate": 12,
         },
         {
-            'number': 1,
-            'name': 'Guest-WiFi',
-            'enabled': True,
-            'authMode': 'open',
-            'splashPage': 'Click-through splash page',
-            'ipAssignmentMode': 'Bridge mode',
-            'useVlanTagging': True,
-            'defaultVlanId': 20,
-            'visible': True,
-            'bandSelection': '5 GHz band only',
-            'minBitrate': 12,
-            'walledGardenEnabled': True,
-            'walledGardenRanges': ['*.google.com', '*.cloudflare.com']
-        }
+            "number": 1,
+            "name": "Guest-WiFi",
+            "enabled": True,
+            "authMode": "open",
+            "splashPage": "Click-through splash page",
+            "ipAssignmentMode": "Bridge mode",
+            "useVlanTagging": True,
+            "defaultVlanId": 20,
+            "visible": True,
+            "bandSelection": "5 GHz band only",
+            "minBitrate": 12,
+            "walledGardenEnabled": True,
+            "walledGardenRanges": ["*.google.com", "*.cloudflare.com"],
+        },
     ]
 
     for ssid in ssids:
         try:
-            dashboard.wireless.updateNetworkWirelessSsid(
-                template_id,
-                **ssid
-            )
+            dashboard.wireless.updateNetworkWirelessSsid(template_id, **ssid)
             print(f"  ✓ SSID {ssid['number']}: {ssid['name']}")
         except meraki.APIError as e:
             print(f"  ✗ Error configuring SSID {ssid['number']}: {e}")
@@ -205,13 +191,13 @@ def create_network_from_template(org_id, network_name, template_id):
         network = dashboard.organizations.createOrganizationNetwork(
             org_id,
             name=network_name,
-            productTypes=['appliance', 'switch', 'wireless'],
-            timeZone='America/Chicago',
-            configTemplateId=template_id  # ← Bind to template!
+            productTypes=["appliance", "switch", "wireless"],
+            timeZone="America/Chicago",
+            configTemplateId=template_id,  # ← Bind to template!
         )
         print(f"  ✓ Network created: {network['id']}")
         print("  ✓ Bound to template (configs will inherit)")
-        return network['id']
+        return network["id"]
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
         return None
@@ -240,9 +226,9 @@ def verify_template_inheritance(network_id, network_name):
     try:
         fw_rules = dashboard.appliance.getNetworkApplianceFirewallL3FirewallRules(network_id)
         print(f"\n✓ Firewall: {len(fw_rules['rules'])} rules inherited")
-        for i, rule in enumerate(fw_rules['rules'][:3], 1):
+        for i, rule in enumerate(fw_rules["rules"][:3], 1):
             print(f"    {i}. [{rule['policy'].upper()}] {rule['comment']}")
-        if len(fw_rules['rules']) > 3:
+        if len(fw_rules["rules"]) > 3:
             print(f"    ... and {len(fw_rules['rules']) - 3} more")
     except meraki.APIError:
         print("\n⚠ Firewall rules not available")
@@ -250,7 +236,7 @@ def verify_template_inheritance(network_id, network_name):
     # Check SSIDs
     try:
         ssids = dashboard.wireless.getNetworkWirelessSsids(network_id)
-        enabled_ssids = [s for s in ssids if s['enabled']]
+        enabled_ssids = [s for s in ssids if s["enabled"]]
         print(f"\n✓ Wireless: {len(enabled_ssids)} SSIDs active")
         for ssid in enabled_ssids:
             print(f"    SSID {ssid['number']}: {ssid['name']}")
@@ -265,8 +251,8 @@ def main():
 
     # Get organization
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
-    org_name = orgs[0]['name']
+    org_id = orgs[0]["id"]
+    org_name = orgs[0]["name"]
 
     print(f"\nOrganization: {org_name}")
     print(f"Org ID: {org_id}")
@@ -295,7 +281,7 @@ def main():
     print("STEP 3: DEPLOY NETWORKS FROM TEMPLATE")
     print("=" * 70)
 
-    sites = ['Branch-Chicago', 'Branch-NYC', 'Branch-LA']
+    sites = ["Branch-Chicago", "Branch-NYC", "Branch-LA"]
     network_ids = []
 
     for site in sites:

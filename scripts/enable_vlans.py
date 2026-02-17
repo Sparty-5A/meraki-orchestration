@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
@@ -19,10 +19,7 @@ def enable_vlans(network_id):
 
     try:
         # Enable VLANs
-        response = dashboard.appliance.updateNetworkApplianceVlansSettings(
-            network_id,
-            vlansEnabled=True
-        )
+        response = dashboard.appliance.updateNetworkApplianceVlansSettings(network_id, vlansEnabled=True)
         print("✓ VLANs enabled successfully!")
         return True
     except meraki.APIError as e:
@@ -34,41 +31,17 @@ def create_vlans(network_id):
     """Create enterprise VLANs"""
 
     vlans_to_create = [
-        {
-            'id': '10',
-            'name': 'Corporate',
-            'subnet': '10.10.10.0/24',
-            'applianceIp': '10.10.10.1'
-        },
-        {
-            'id': '20',
-            'name': 'Guest',
-            'subnet': '10.10.20.0/24',
-            'applianceIp': '10.10.20.1'
-        },
-        {
-            'id': '30',
-            'name': 'IoT',
-            'subnet': '10.10.30.0/24',
-            'applianceIp': '10.10.30.1'
-        },
-        {
-            'id': '40',
-            'name': 'Voice',
-            'subnet': '10.10.40.0/24',
-            'applianceIp': '10.10.40.1'
-        }
+        {"id": "10", "name": "Corporate", "subnet": "10.10.10.0/24", "applianceIp": "10.10.10.1"},
+        {"id": "20", "name": "Guest", "subnet": "10.10.20.0/24", "applianceIp": "10.10.20.1"},
+        {"id": "30", "name": "IoT", "subnet": "10.10.30.0/24", "applianceIp": "10.10.30.1"},
+        {"id": "40", "name": "Voice", "subnet": "10.10.40.0/24", "applianceIp": "10.10.40.1"},
     ]
 
     print("\nCreating VLANs...")
     for vlan in vlans_to_create:
         try:
             response = dashboard.appliance.createNetworkApplianceVlan(
-                network_id,
-                id=vlan['id'],
-                name=vlan['name'],
-                subnet=vlan['subnet'],
-                applianceIp=vlan['applianceIp']
+                network_id, id=vlan["id"], name=vlan["name"], subnet=vlan["subnet"], applianceIp=vlan["applianceIp"]
             )
             print(f"✓ Created VLAN {vlan['id']}: {vlan['name']} ({vlan['subnet']})")
         except meraki.APIError as e:
@@ -78,10 +51,10 @@ def create_vlans(network_id):
 def main():
     # Get network
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
-    branch_network = [n for n in networks if n['name'] == 'branch office'][0]
-    network_id = branch_network['id']
+    branch_network = [n for n in networks if n["name"] == "branch office"][0]
+    network_id = branch_network["id"]
 
     print(f"Network: {branch_network['name']}")
     print(f"Network ID: {network_id}")

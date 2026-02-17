@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv('MERAKI_API_KEY')
+API_KEY = os.getenv("MERAKI_API_KEY")
 dashboard = meraki.DashboardAPI(API_KEY, suppress_logging=True)
 
 
@@ -19,11 +19,11 @@ def main():
 
     # Get organization
     orgs = dashboard.organizations.getOrganizations()
-    org_id = orgs[0]['id']
+    org_id = orgs[0]["id"]
 
     # Get branch networks
     networks = dashboard.organizations.getOrganizationNetworks(org_id)
-    branch_networks = [n for n in networks if n['name'].startswith('Branch-')]
+    branch_networks = [n for n in networks if n["name"].startswith("Branch-")]
 
     print(f"\nFound {len(branch_networks)} networks:\n")
 
@@ -32,16 +32,13 @@ def main():
 
         # Check current status
         try:
-            settings = dashboard.appliance.getNetworkApplianceVlansSettings(network['id'])
-            current = settings.get('vlansEnabled', False)
+            settings = dashboard.appliance.getNetworkApplianceVlansSettings(network["id"])
+            current = settings.get("vlansEnabled", False)
             print(f"  Current: VLANs {'enabled' if current else 'disabled'}")
 
             if not current:
                 # Enable VLANs
-                dashboard.appliance.updateNetworkApplianceVlansSettings(
-                    network['id'],
-                    vlansEnabled=True
-                )
+                dashboard.appliance.updateNetworkApplianceVlansSettings(network["id"], vlansEnabled=True)
                 print("  ✓ VLANs now ENABLED")
             else:
                 print("  ✓ Already enabled")
