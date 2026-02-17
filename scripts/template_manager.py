@@ -210,7 +210,7 @@ def create_network_from_template(org_id, network_name, template_id):
             configTemplateId=template_id  # ← Bind to template!
         )
         print(f"  ✓ Network created: {network['id']}")
-        print(f"  ✓ Bound to template (configs will inherit)")
+        print("  ✓ Bound to template (configs will inherit)")
         return network['id']
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
@@ -234,7 +234,7 @@ def verify_template_inheritance(network_id, network_name):
         if len(vlans) > 3:
             print(f"    ... and {len(vlans) - 3} more")
     except meraki.APIError:
-        print(f"\n⚠ VLANs not available (may need manual enablement)")
+        print("\n⚠ VLANs not available (may need manual enablement)")
 
     # Check firewall
     try:
@@ -245,7 +245,7 @@ def verify_template_inheritance(network_id, network_name):
         if len(fw_rules['rules']) > 3:
             print(f"    ... and {len(fw_rules['rules']) - 3} more")
     except meraki.APIError:
-        print(f"\n⚠ Firewall rules not available")
+        print("\n⚠ Firewall rules not available")
 
     # Check SSIDs
     try:
@@ -255,7 +255,7 @@ def verify_template_inheritance(network_id, network_name):
         for ssid in enabled_ssids:
             print(f"    SSID {ssid['number']}: {ssid['name']}")
     except meraki.APIError:
-        print(f"\n⚠ SSIDs not available")
+        print("\n⚠ SSIDs not available")
 
 
 def main():
@@ -311,10 +311,10 @@ def main():
     print("\n" + "=" * 70)
     print("DEPLOYMENT SUMMARY")
     print("=" * 70)
-    print(f"✓ Template: Enterprise-Standard-Template")
-    print(f"  - 5 VLANs configured")
-    print(f"  - 6 firewall rules configured")
-    print(f"  - 2 SSIDs configured")
+    print("✓ Template: Enterprise-Standard-Template")
+    print("  - 5 VLANs configured")
+    print("  - 6 firewall rules configured")
+    print("  - 2 SSIDs configured")
     print(f"\n✓ Networks deployed: {len(network_ids)}")
     for net_id, name in network_ids:
         print(f"  - {name}")

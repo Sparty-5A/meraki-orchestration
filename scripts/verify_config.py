@@ -22,7 +22,7 @@ def main():
     network_id = branch_network['id']
 
     print("=" * 70)
-    print(f"MERAKI BRANCH OFFICE - COMPLETE CONFIGURATION REPORT")
+    print("MERAKI BRANCH OFFICE - COMPLETE CONFIGURATION REPORT")
     print("=" * 70)
 
     # VLANs
@@ -42,7 +42,7 @@ def main():
     print(f"  ... and {len(fw_rules['rules']) - 5} more rules")
 
     # Wireless SSIDs - Get detailed info
-    print(f"\n📡 WIRELESS SSIDs:")
+    print("\n📡 WIRELESS SSIDs:")
     print("-" * 70)
     for i in range(15):  # Meraki supports 0-14 SSIDs
         try:
@@ -63,7 +63,7 @@ def main():
             continue
 
     # Devices
-    print(f"\n🖥️  DEVICES:")
+    print("\n🖥️  DEVICES:")
     print("-" * 70)
     devices = dashboard.networks.getNetworkDevices(network_id)
     for device in devices:

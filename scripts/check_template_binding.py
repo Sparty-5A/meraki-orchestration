@@ -52,7 +52,7 @@ def main():
                     break
             print(f"  ✓ Template name: {template_name}")
         else:
-            print(f"  ✗ NOT bound to any template")
+            print("  ✗ NOT bound to any template")
 
         # Try to check VLANs
         try:

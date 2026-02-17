@@ -25,7 +25,7 @@ def bind_network_to_template(network_id, network_name, template_id):
             name=network_name,  # Keep same name, but required
             configTemplateId=template_id
         )
-        print(f"  ✓ Successfully bound to template")
+        print("  ✓ Successfully bound to template")
         return True
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")

@@ -90,8 +90,8 @@ def create_employee_policy(network_id):
             }
         )
         print(f"  ✓ Employee Policy created: {policy['groupPolicyId']}")
-        print(f"    - 50 Mbps bandwidth limit")
-        print(f"    - Business hours only (8am-6pm, Mon-Fri)")
+        print("    - 50 Mbps bandwidth limit")
+        print("    - Business hours only (8am-6pm, Mon-Fri)")
         return policy['groupPolicyId']
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
@@ -156,9 +156,9 @@ def create_contractor_policy(network_id):
             }
         )
         print(f"  ✓ Contractor Policy created: {policy['groupPolicyId']}")
-        print(f"    - 5 Mbps bandwidth limit")
-        print(f"    - Limited hours (9am-5pm, Mon-Fri)")
-        print(f"    - Blocks internal networks (RFC1918)")
+        print("    - 5 Mbps bandwidth limit")
+        print("    - Limited hours (9am-5pm, Mon-Fri)")
+        print("    - Blocks internal networks (RFC1918)")
         return policy['groupPolicyId']
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")
@@ -223,9 +223,9 @@ def create_guest_policy(network_id):
             }
         )
         print(f"  ✓ Guest Policy created: {policy['groupPolicyId']}")
-        print(f"    - 2 Mbps bandwidth limit")
-        print(f"    - Internet only (no internal access)")
-        print(f"    - 24/7 access")
+        print("    - 2 Mbps bandwidth limit")
+        print("    - Internet only (no internal access)")
+        print("    - 24/7 access")
         return policy['groupPolicyId']
     except meraki.APIError as e:
         print(f"  ✗ Error: {e}")

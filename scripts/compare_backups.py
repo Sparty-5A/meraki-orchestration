@@ -5,7 +5,6 @@ Compare two backup files to see what changed
 """
 
 import json
-import sys
 from pathlib import Path
 from datetime import datetime
 

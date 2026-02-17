@@ -6,7 +6,7 @@ Monitor device health, client connectivity, and network performance
 
 import meraki
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -141,7 +141,7 @@ def check_client_connectivity(network_id):
 
         # Show recently connected clients
         if clients:
-            print(f"\nRecently active clients:")
+            print("\nRecently active clients:")
             print(f"{'Description':<30} {'IP':<15} {'VLAN':<6} {'Usage':<10}")
             print("-" * 70)
 
@@ -300,7 +300,7 @@ def check_switch_ports(network_id):
             # Show configured ports
             configured = [p for p in ports if p.get('name')]
             if configured:
-                print(f"\n  Configured Ports:")
+                print("\n  Configured Ports:")
                 for port in configured[:5]:  # Show first 5
                     port_id = port['portId']
                     port_name = port['name'][:20]

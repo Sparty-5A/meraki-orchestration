@@ -31,7 +31,7 @@ def get_template_config(template_id):
         config['vlans'] = vlans
         print(f"  ✓ Found {len(vlans)} VLANs")
     except:
-        print(f"  ⚠ Could not read VLANs")
+        print("  ⚠ Could not read VLANs")
 
     # Get firewall rules
     try:
@@ -39,7 +39,7 @@ def get_template_config(template_id):
         config['firewall_rules'] = fw
         print(f"  ✓ Found {len(fw['rules'])} firewall rules")
     except:
-        print(f"  ⚠ Could not read firewall rules")
+        print("  ⚠ Could not read firewall rules")
 
     # Get SSIDs
     try:
@@ -48,7 +48,7 @@ def get_template_config(template_id):
         config['ssids'] = enabled_ssids
         print(f"  ✓ Found {len(enabled_ssids)} enabled SSIDs")
     except:
-        print(f"  ⚠ Could not read SSIDs")
+        print("  ⚠ Could not read SSIDs")
 
     return config
 
@@ -96,7 +96,7 @@ def apply_config_to_network(network_id, network_name, template_config):
 
     # Apply firewall rules
     if template_config['firewall_rules']:
-        print(f"\nApplying firewall rules...")
+        print("\nApplying firewall rules...")
         try:
             dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(
                 network_id,
@@ -108,7 +108,7 @@ def apply_config_to_network(network_id, network_name, template_config):
 
     # Apply SSIDs
     if template_config['ssids']:
-        print(f"\nApplying SSIDs...")
+        print("\nApplying SSIDs...")
         for ssid in template_config['ssids']:
             try:
                 # Remove read-only fields

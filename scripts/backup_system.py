@@ -119,7 +119,7 @@ def backup_network_full(network_id, network_name):
             'ssids': configured_ssids,
             'rf_profiles': dashboard.wireless.getNetworkWirelessRfProfiles(network_id)
         }
-        print(f"  ✓ Wireless configuration backed up")
+        print("  ✓ Wireless configuration backed up")
         print(f"    - {len(configured_ssids)} configured SSID(s)")
     except Exception as e:
         print(f"  ⚠ Wireless config: {e}")
@@ -167,7 +167,7 @@ def save_backup(backup, network_name):
         json.dump(backup, f, indent=2)
 
     print(f"\n{'=' * 70}")
-    print(f"BACKUP SAVED")
+    print("BACKUP SAVED")
     print(f"{'=' * 70}")
     print(f"File: {filename}")
     print(f"Size: {filename.stat().st_size / 1024:.1f} KB")
@@ -207,7 +207,7 @@ def list_backups():
             date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
 
             print(f"{i:<4} {network_name:<30} {date_str:<20} {size:>6.1f} KB")
-        except Exception as e:
+        except Exception:
             print(f"{i:<4} {backup_file.name:<30} [Error reading file]")
 
     return backups

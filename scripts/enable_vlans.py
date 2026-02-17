@@ -4,7 +4,6 @@ Enable VLANs and create enterprise network segmentation
 """
 
 import meraki
-import json
 import os
 from dotenv import load_dotenv
 

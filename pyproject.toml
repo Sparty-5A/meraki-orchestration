@@ -1,7 +1,7 @@
 [project]
 name = "meraki-orchestration"
 version = "1.0.0"
-requires-python = ">=3.13"
+requires-python = ">=3.9"
 dependencies = [
     "meraki>=1.0.0",
     "python-dotenv>=1.0.0",
@@ -10,8 +10,14 @@ dependencies = [
 [tool.ruff]
 line-length = 127
 target-version = "py313"
+
+[tool.ruff.lint]
 select = ["E", "F", "W"]
-ignore = ["E501"]
+ignore = [
+    "E501",  # Line too long
+    "E722",  # Bare except
+    "F841",  # Unused variable
+]
 
 [tool.black]
 line-length = 127

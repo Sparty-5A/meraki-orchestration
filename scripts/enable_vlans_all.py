@@ -42,9 +42,9 @@ def main():
                     network['id'],
                     vlansEnabled=True
                 )
-                print(f"  ✓ VLANs now ENABLED")
+                print("  ✓ VLANs now ENABLED")
             else:
-                print(f"  ✓ Already enabled")
+                print("  ✓ Already enabled")
 
         except Exception as e:
             print(f"  ✗ Error: {e}")

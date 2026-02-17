@@ -50,7 +50,7 @@ def export_switch_config(serial, network_name):
             'firmware': device.get('firmware'),
             'tags': device.get('tags', [])
         }
-        print(f"  ✓ Device info retrieved")
+        print("  ✓ Device info retrieved")
     except Exception as e:
         print(f"  ⚠ Could not get device info: {e}")
 
@@ -80,7 +80,7 @@ def display_config_summary(config):
 
     # Device info
     device = config.get('device_info', {})
-    print(f"\nDevice Information:")
+    print("\nDevice Information:")
     print(f"  Model: {device.get('model', 'N/A')}")
     print(f"  Name: {device.get('name', 'N/A')}")
     print(f"  Serial: {config['export_info']['switch_serial']}")
@@ -94,7 +94,7 @@ def display_config_summary(config):
     poe_ports = [p for p in ports if p.get('poeEnabled')]
     voice_ports = [p for p in ports if p.get('voiceVlan')]
 
-    print(f"\nPort Statistics:")
+    print("\nPort Statistics:")
     print(f"  Total Ports: {len(ports)}")
     print(f"  Access Ports: {len(access_ports)}")
     print(f"  Trunk Ports: {len(trunk_ports)}")

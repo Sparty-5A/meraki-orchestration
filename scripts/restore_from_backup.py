@@ -116,7 +116,7 @@ def restore_firewall_rules(network_id, firewall_backup):
             explicit_rules.append(rule)
 
         print(f"  ℹ Restoring {len(explicit_rules)} explicit security rules")
-        print(f"  ℹ Meraki will add its own default allow rule automatically")
+        print("  ℹ Meraki will add its own default allow rule automatically")
 
         # Replace all rules with filtered set
         dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(
@@ -124,7 +124,7 @@ def restore_firewall_rules(network_id, firewall_backup):
             rules=explicit_rules
         )
 
-        print(f"  ✓ Firewall rules restored")
+        print("  ✓ Firewall rules restored")
 
     except Exception as e:
         print(f"  ⚠ Firewall rules: {e}")
@@ -249,13 +249,13 @@ def restore_from_backup(backup_file, network_id):
         backup = json.load(f)
 
     meta = backup['metadata']
-    print(f"\nBackup Details:")
+    print("\nBackup Details:")
     print(f"  Network: {meta['network_name']}")
     print(f"  Date: {meta['timestamp']}")
     print(f"  Backup Version: {meta['backup_version']}")
 
-    print(f"\n⚠️  WARNING: This will OVERWRITE current configuration!")
-    print(f"⚠️  Make sure you have a current backup before proceeding!")
+    print("\n⚠️  WARNING: This will OVERWRITE current configuration!")
+    print("⚠️  Make sure you have a current backup before proceeding!")
 
     confirm = input("\nType 'RESTORE' to continue, or anything else to cancel: ")
 

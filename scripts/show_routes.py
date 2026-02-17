@@ -30,7 +30,7 @@ def main():
         print(f"\nVLAN {vlan['id']}: {vlan['name']}")
         print(f"  Subnet: {vlan['subnet']}")
         print(f"  MX IP (Gateway): {vlan['applianceIp']}")
-        print(f"  ↳ MX100 is the router for this VLAN")
+        print("  ↳ MX100 is the router for this VLAN")
 
     print("\n" + "=" * 60)
     print("Routing Behavior:")
