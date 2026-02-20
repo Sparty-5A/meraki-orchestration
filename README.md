@@ -355,9 +355,9 @@ MIT License - See LICENSE file for details
 - Specializing in Infrastructure as Code, SD-WAN, and cloud networking
 
 **Connect:**
-- GitHub: [@YOUR_GITHUB_USERNAME](https://github.com/YOUR_GITHUB_USERNAME)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/YOUR_PROFILE)
-- Portfolio: [Your Website](https://your-website.com)
+- GitHub: (https://github.com/Sparty-5A)
+- LinkedIn: (https://www.linkedin.com/in/scott-penry-0a277829/)
+- Portfolio: (https://d7i4z01k04a36.cloudfront.net/)
 
 ---
 
